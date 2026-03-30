@@ -20,10 +20,11 @@ type ServerConfig struct {
 }
 
 type DatabaseConfig struct {
-	Host string `mapstructure:"DATABASE_HOST"`
-	Port string `mapstructure:"DATABASE_PORT"`
-	User string `mapstructure:"DATABASE_USER"`
-	Name string `mapstructure:"DATABASE_NAME"`
+	Host     string `mapstructure:"DATABASE_HOST"`
+	Port     string `mapstructure:"DATABASE_PORT"`
+	Password string `mapstructure:"DATABASE_PASSWORD"`
+	User     string `mapstructure:"DATABASE_USER"`
+	Name     string `mapstructure:"DATABASE_NAME"`
 }
 
 type RedisConfig struct {

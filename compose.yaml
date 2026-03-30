@@ -18,6 +18,10 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
     environment:
       MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
       MYSQL_DATABASE: ${DATABASE_NAME}
@@ -42,6 +46,43 @@ services:
       - ${DATABASE_PORT}:${DATABASE_PORT}
     volumes:
       - mysql_data:/var/lib/mysql
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    container_name: easyChatRedis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping", "-h", "localhost"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+  kafka:
+    image: apache/kafka:latest
+    restart: unless-stopped
+    container_name: easyChatKafka
+    healthcheck:
+      test: ["CMD", "kafka-server-status.sh", "localhost:9092"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    environment:
+        KAFKA_NODE_ID: 1
+        KAFKA_PROCESS_ROLES: broker,controller
+        KAFKA_LISTENERS: PLAINTEXT://localhost:${KAFKA_PORT},CONTROLLER://localhost:9093
+        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:${KAFKA_PORT}
+        KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+        KAFKA_CONTROLLER_QUORUM_VOTERS: 1@localhost:9093
+        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+        KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+        KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+        KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+        KAFKA_NUM_PARTITIONS: 3
+    ports:
+      - ${KAFKA_PORT}:${KAFKA_PORT}
 volumes:
     mysql_data:
 # The commented out section below is an example of how to define a PostgreSQL

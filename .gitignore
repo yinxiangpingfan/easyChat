@@ -4,5 +4,4 @@ main
 logFile/*.log
 .vscode/
 .claude/
-
-
+.env.product    

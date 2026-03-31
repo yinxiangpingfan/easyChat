@@ -6,17 +6,20 @@ import (
 	"github.com/spf13/viper"
 )
 
-var config *Config
-
 type Config struct {
-	Server   ServerConfig   `mapstructure:",squash"`
-	Database DatabaseConfig `mapstructure:",squash"`
-	Redis    RedisConfig    `mapstructure:",squash"`
-	Kafka    KafkaConfig    `mapstructure:",squash"`
+	Server         ServerConfig   `mapstructure:",squash"`
+	Database       DatabaseConfig `mapstructure:",squash"`
+	Redis          RedisConfig    `mapstructure:",squash"`
+	Kafka          KafkaConfig    `mapstructure:",squash"`
+	ConfigSettings ConfigSetting  `mapstructure:",squash"`
 }
 
 type ServerConfig struct {
 	Port string `mapstructure:"SERVER_PORT"`
+}
+
+type ConfigSetting struct {
+	Settings string `mapstructure:"CONFIG_SETTING"`
 }
 
 type DatabaseConfig struct {
@@ -57,6 +60,9 @@ func LoadConfigEnv() error {
 		Kafka: KafkaConfig{
 			Port: viper.GetString("KAFKA_PORT"),
 		},
+		ConfigSettings: ConfigSetting{
+			Settings: viper.GetString("CONFIG_SETTING"),
+		},
 	}
 	return nil
 }
@@ -74,17 +80,23 @@ func LoadConfigFile(path string) error {
 	return nil
 }
 
-func GetConfig(method int, path string) *Config {
-	if config == nil {
-		if method == 0 {
-			_ = LoadConfigEnv()
-		} else {
-			e := LoadConfigFile(path)
-			fmt.Println(e)
-		}
-		if config == nil {
-			panic("config is nil")
+var config *Config
+
+func GetConfig(path string) *Config {
+	var err error
+	// 从环境变量加载配置
+	_ = LoadConfigEnv()
+	if config.ConfigSettings.Settings == "file" || config.ConfigSettings.Settings == "" {
+		//如果没有本地环境变量或者设定从文件获取变量
+		err = LoadConfigFile(path)
+		if err != nil {
+			panic(err)
 		}
 	}
+
+	if config == nil || config.ConfigSettings.Settings == "" {
+		panic("读取配置失败")
+	}
+
 	return config
 }

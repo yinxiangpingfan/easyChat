@@ -1,0 +1,8 @@
+{"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:13","func":"easyChat/log.TestInitLogrus","level":"info","msg":"这是测试日志2222","time":"2026-04-04 14:38:25.229"}
+{"age":18,"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:14","func":"easyChat/log.TestInitLogrus","level":"info","msg":"这是测试日志2222","name":"hhh","time":"2026-04-04 14:38:25.230"}
+{"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:15","func":"easyChat/log.TestInitLogrus","level":"error","msg":"这是错误日志23","time":"2026-04-04 14:38:25.230"}
+{"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:19","func":"easyChat/log.TestInitLogrus","level":"panic","msg":"这是恐慌错误日志","time":"2026-04-04 14:38:25.230"}
+{"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:13","func":"easyChat/log.TestInitLogrus","level":"info","msg":"这是测试日志2222","time":"2026-04-04 14:38:49.075"}
+{"age":18,"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:14","func":"easyChat/log.TestInitLogrus","level":"info","msg":"这是测试日志2222","name":"hhh","time":"2026-04-04 14:38:49.075"}
+{"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:15","func":"easyChat/log.TestInitLogrus","level":"error","msg":"这是错误日志23","time":"2026-04-04 14:38:49.075"}
+{"file":"/Users/easyimpr/Desktop/chat/easyChat/log/logger_test.go:19","func":"easyChat/log.TestInitLogrus","level":"panic","msg":"这是恐慌错误日志","time":"2026-04-04 14:38:49.075"}

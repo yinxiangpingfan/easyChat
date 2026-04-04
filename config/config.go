@@ -7,11 +7,17 @@ import (
 )
 
 type Config struct {
-	Server         ServerConfig   `mapstructure:",squash"`
-	Database       DatabaseConfig `mapstructure:",squash"`
-	Redis          RedisConfig    `mapstructure:",squash"`
-	Kafka          KafkaConfig    `mapstructure:",squash"`
-	ConfigSettings ConfigSetting  `mapstructure:",squash"`
+	Server         ServerConfig    `mapstructure:",squash"`
+	Database       DatabaseConfig  `mapstructure:",squash"`
+	Redis          RedisConfig     `mapstructure:",squash"`
+	Kafka          KafkaConfig     `mapstructure:",squash"`
+	ConfigSettings ConfigSetting   `mapstructure:",squash"`
+	AliAccess      AliAccessConfig `mapstructure:",squash"`
+}
+
+type AliAccessConfig struct {
+	AccessKey string `mapstructure:"ALIYUN_ACCESS_KEY_ID"`
+	SecretKey string `mapstructure:"ALIYUN_ACCESS_KEY_SECRET"`
 }
 
 type ServerConfig struct {

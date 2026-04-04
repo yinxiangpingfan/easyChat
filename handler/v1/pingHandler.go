@@ -6,6 +6,6 @@ import (
 
 func PingHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		JosnBack(c, "pong", nil, 0)
+		JsonBack(c, 200, "pong", nil, 0)
 	}
 }

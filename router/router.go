@@ -18,5 +18,9 @@ func InitRouter() {
 	global.GinEngine.Use(cors.New(corsConfig))
 	//http自动转成https
 	//TODO
-	global.GinEngine.GET("/ping", v1.PingHandler())
+	v1Group := global.GinEngine.Group("/v1")
+	v1Group.GET("/ping", v1.PingHandler())
+	//用户相关接口
+	userGroup := v1Group.Group("/user")
+	userGroup.POST("/register", v1.RegisterHandler()) //注册
 }

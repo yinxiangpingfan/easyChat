@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"easyChat/global"
 	"easyChat/handler/v1/req"
 	"easyChat/model"
@@ -11,13 +12,25 @@ import (
 	"github.com/google/uuid"
 )
 
-func (u *UserService) RegisterService(req req.RegisterRequest) (int, string, interface{}, int) {
+func (u *UserService) RegisterService(ctx context.Context, req req.RegisterRequest) (int, string, interface{}, int) {
 	//校验参数
 	if tools.IsPhone(req.Telephone) {
 		global.Logger.Debugf("手机号格式错误, req: %v", req.Telephone)
 		return 400002, "手机号格式错误", nil, -1
 	}
 	//校验验证码
+	code, err := tools.VerifyCode(ctx, req.SmsCode, CODE_PREFIX+req.Telephone)
+	if err != nil {
+		switch code {
+		case 400004:
+			return 400004, "验证码错误", nil, -1
+		case 400005:
+			return 400005, "验证码已过期或不存在", nil, -1
+		case 500001:
+			global.Logger.Errorf("注册时校验验证码失败, 发生错误, req: %v", req.Telephone)
+			return 500001, "注册失败，请稍后重试", nil, -1
+		}
+	}
 
 	//判断手机号是否注册过
 	res := repo.UserRepositoryInstance.IsTelephoneRegistered(req.Telephone)

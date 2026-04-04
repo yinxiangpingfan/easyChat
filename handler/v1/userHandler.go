@@ -31,7 +31,7 @@ func RegisterHandler() gin.HandlerFunc {
 			JsonBack(c, 400001, "参数校验失败:注册请求参数错误", nil, -1)
 			return
 		}
-		code, message, data, ret := service.UserServiceInstance.RegisterService(req)
+		code, message, data, ret := service.UserServiceInstance.RegisterService(c, req)
 		JsonBack(c, code, message, data, ret)
 	}
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"easyChat/errors"
 	"easyChat/global"
 	"easyChat/handler/v1/req"
 	"easyChat/model"
@@ -16,19 +17,19 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	//校验参数
 	if tools.IsPhone(req.Telephone) {
 		global.Logger.Debugf("手机号格式错误, req: %v", req.Telephone)
-		return 400002, "手机号格式错误", nil, -1
+		return errors.ErrPhoneFormat.Code, errors.ErrPhoneFormat.Message, nil, -1
 	}
 	//校验验证码
 	code, err := tools.VerifyCode(ctx, req.SmsCode, CODE_PREFIX+req.Telephone)
 	if err != nil {
 		switch code {
-		case 400004:
-			return 400004, "验证码错误", nil, -1
-		case 400005:
-			return 400005, "验证码已过期或不存在", nil, -1
-		case 500001:
+		case errors.ErrSmsCodeWrong.Code:
+			return errors.ErrSmsCodeWrong.Code, errors.ErrSmsCodeWrong.Message, nil, -1
+		case errors.ErrSmsCodeExpired.Code:
+			return errors.ErrSmsCodeExpired.Code, errors.ErrSmsCodeExpired.Message, nil, -1
+		case errors.ErrRegisterFailed.Code:
 			global.Logger.Errorf("注册时校验验证码失败, 发生错误, req: %v", req.Telephone)
-			return 500001, "注册失败，请稍后重试", nil, -1
+			return errors.ErrRegisterFailed.Code, errors.ErrRegisterFailed.Message, nil, -1
 		}
 	}
 
@@ -37,16 +38,16 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	switch res {
 	case -1:
 		global.Logger.Errorf("注册时查询数据库失败, req: %v", req.Telephone)
-		return 500001, "注册失败，请稍后重试", nil, -1
+		return errors.ErrRegisterFailed.Code, errors.ErrRegisterFailed.Message, nil, -1
 	case -2:
 		global.Logger.Infof("注册时手机号已注册, req: %v", req.Telephone)
-		return 400003, "手机号已注册", nil, -1
+		return errors.ErrPhoneExist.Code, errors.ErrPhoneExist.Message, nil, -1
 	}
 	//加密密码
 	salt := tools.GenerateSalt()
 	if salt == "" {
 		global.Logger.Errorf("注册时生成盐值失败, req: %v", req.Telephone)
-		return 500001, "注册失败，请稍后重试", nil, -1
+		return errors.ErrRegisterFailed.Code, errors.ErrRegisterFailed.Message, nil, -1
 	}
 	req.Password = tools.PasswordHash(req.Password, salt)
 	//保存用户信息到数据库
@@ -61,7 +62,7 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	switch res {
 	case -1:
 		global.Logger.Errorf("注册时保存用户信息到数据库失败, req: %v", req.Telephone)
-		return 500001, "注册失败，请稍后重试", nil, -1
+		return errors.ErrRegisterFailed.Code, errors.ErrRegisterFailed.Message, nil, -1
 	}
 	global.Logger.Infof("注册时保存用户信息到数据库成功, req: %v", req.Telephone)
 	//返回注册成功
@@ -70,5 +71,5 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 		"uuid":      uuid,
 		"nickname":  req.Nickname,
 	}
-	return 200, "注册成功", response, 0
+	return errors.SuccessRegister.Code, errors.SuccessRegister.Message, response, 0
 }

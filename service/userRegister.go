@@ -11,18 +11,14 @@ import (
 	"github.com/google/uuid"
 )
 
-type UserService struct{}
-
-var UserServiceInstance = &UserService{}
-
 func (u *UserService) RegisterService(req req.RegisterRequest) (int, string, interface{}, int) {
 	//校验参数
 	if tools.IsPhone(req.Telephone) {
 		global.Logger.Debugf("手机号格式错误, req: %v", req.Telephone)
-		return 100001, "手机号格式错误", nil, -1
+		return 400002, "手机号格式错误", nil, -1
 	}
 	//校验验证码
-	//TODO
+
 	//判断手机号是否注册过
 	res := repo.UserRepositoryInstance.IsTelephoneRegistered(req.Telephone)
 	switch res {
@@ -31,7 +27,7 @@ func (u *UserService) RegisterService(req req.RegisterRequest) (int, string, int
 		return 500001, "注册失败，请稍后重试", nil, -1
 	case -2:
 		global.Logger.Infof("注册时手机号已注册, req: %v", req.Telephone)
-		return 100002, "手机号已注册", nil, -1
+		return 400003, "手机号已注册", nil, -1
 	}
 	//加密密码
 	salt := tools.GenerateSalt()

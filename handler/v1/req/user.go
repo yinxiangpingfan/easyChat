@@ -8,3 +8,7 @@ type RegisterRequest struct {
 	Nickname  string `json:"nickname" binding:"required"`
 	SmsCode   string `json:"sms_code" binding:"required"`
 }
+
+type SmsCodeRequest struct {
+	Telephone string `json:"telephone" binding:"required"`
+}

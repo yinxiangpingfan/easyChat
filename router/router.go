@@ -23,4 +23,5 @@ func InitRouter() {
 	//用户相关接口
 	userGroup := v1Group.Group("/user")
 	userGroup.POST("/register", v1.RegisterHandler()) //注册
+	userGroup.POST("/sms", v1.SmsCodeHandler())       //验证码登录
 }

@@ -89,7 +89,7 @@ func SendTelephoneCode(args []*string, code string) (_err error) {
 		d.Decode(&data)
 		if m, ok := data.(map[string]interface{}); ok {
 			recommend, _ := m["Recommend"]
-			global.Logger.Infof("SendSmsVerifyCodeRecommend: %v,%v", recommend, error.Message)
+			global.Logger.Errorf("SendSmsVerifyCodeRecommend: %v,%v", recommend, error.Message)
 
 		} else {
 			global.Logger.Errorf("SendSmsVerifyCodeError: %v", error)

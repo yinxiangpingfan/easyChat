@@ -17,10 +17,10 @@ func TestSendTelephoneCode(t *testing.T) {
 
 	// 测试参数
 	// 请根据你的阿里云短信配置修改以下参数
-	signName := "速通互联验证服务"       // 签名名称 - 需要修改为你的签名
-	phoneNumber := "13000000000" // 手机号
-	templateCode := "100001"     // 模板代码 - 需要修改为你的模板
-	validDuration := "5"         // 验证码有效期（分钟）
+	signName := "速通互联验证服务"        // 签名名称 - 需要修改为你的签名
+	phoneNumber := "130000000000" // 手机号
+	templateCode := "100001"      // 模板代码 - 需要修改为你的模板
+	validDuration := "5"          // 验证码有效期（分钟）
 
 	args := []*string{
 		&signName,

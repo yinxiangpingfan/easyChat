@@ -36,3 +36,17 @@ func RegisterHandler() gin.HandlerFunc {
 		JsonBack(c, code, message, data, ret)
 	}
 }
+
+// 登录
+// func LoginHandler() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		var req req.LoginRequest
+// 		if err := c.ShouldBindJSON(&req); err != nil {
+// 			global.Logger.Warnf("登录时参数绑定失败, err: %v", err)
+// 			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
+// 			return
+// 		}
+// 		code, message, data, ret := service.UserServiceInstance.LoginService(c, req)
+// 		JsonBack(c, code, message, data, ret)
+// 	}
+// }

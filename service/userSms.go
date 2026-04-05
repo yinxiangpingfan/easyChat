@@ -48,8 +48,17 @@ func (u *UserService) SmsCodeService(ctx context.Context, req req.SmsCodeRequest
 		return errors.ErrSmsCodeSendFailed.Code, errors.ErrSmsCodeSendFailed.Message, nil, -1
 	}
 	//发送验证码
-	arr := []*string{}
-	err = tools.SendTelephoneCode(arr, smsCodeStr)
+	signName := "速通互联验证服务"       // 签名名称
+	phoneNumber := req.Telephone // 手机号
+	templateCode := "100001"     // 模板代码
+	validDuration := "5"         // 验证码有效期（分钟）
+	args := []*string{
+		&signName,
+		&phoneNumber,
+		&templateCode,
+		&validDuration,
+	}
+	err = tools.SendTelephoneCode(args, smsCodeStr)
 	if err != nil {
 		//删除验证码锁
 		global.RedisClient.Del(ctx, LOCK_PREFIX+req.Telephone, CODE_PREFIX+req.Telephone)

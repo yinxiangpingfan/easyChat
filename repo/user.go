@@ -4,6 +4,7 @@ import (
 	"easyChat/global"
 	"easyChat/model"
 	"errors"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -25,7 +26,9 @@ func (u *UserRepository) IsTelephoneRegistered(tele string) int {
 }
 
 func (u *UserRepository) SaveUserInfo(user model.UserInfo) int {
+	user.CreatedAt = time.Now()
 	if res := global.DB.Create(&user); res.Error != nil {
+		global.Logger.Errorf("保存用户信息失败: %v", res.Error)
 		return -1
 	}
 	return 0

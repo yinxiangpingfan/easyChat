@@ -5,7 +5,7 @@ import "time"
 // 群组表
 type GroupInfo struct {
 	Id        uint64     `gorm:"primaryKey;column:id;comment:自增id"`
-	Uuid      string     `gorm:"uniqueIndex;type:char(41);column:uuid;not null;comment:群组唯一id"`
+	Uuid      string     `gorm:"uniqueIndex;type:char(45);column:uuid;not null;comment:群组唯一id"`
 	Name      string     `gorm:"type:varchar(20);column:name;not null;comment:群名称"`
 	Notice    string     `gorm:"type:varchar(500);column:notice;comment:群公告"`
 	Members   string     `gorm:"type:json;column:members;comment:群组成员"`

@@ -5,6 +5,7 @@ import (
 	"easyChat/errors"
 	"easyChat/global"
 	"easyChat/handler/v1/req"
+	"easyChat/handler/v1/resp"
 	"easyChat/model"
 	"easyChat/repo"
 	"easyChat/tools"
@@ -15,7 +16,7 @@ import (
 
 func (u *UserService) RegisterService(ctx context.Context, req req.RegisterRequest) (int, string, interface{}, int) {
 	//校验参数
-	if tools.IsPhone(req.Telephone) {
+	if !tools.IsPhone(req.Telephone) {
 		global.Logger.Debugf("手机号格式错误, req: %v", req.Telephone)
 		return errors.ErrPhoneFormat.Code, errors.ErrPhoneFormat.Message, nil, -1
 	}
@@ -66,10 +67,10 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	}
 	global.Logger.Infof("注册时保存用户信息到数据库成功, req: %v", req.Telephone)
 	//返回注册成功
-	response := map[string]string{
-		"telephone": req.Telephone,
-		"uuid":      uuid,
-		"nickname":  req.Nickname,
+	response := resp.RegisterResp{
+		Uuid:      uuid,
+		NickName:  req.Nickname,
+		Telephone: req.Telephone,
 	}
 	return errors.SuccessRegister.Code, errors.SuccessRegister.Message, response, 0
 }

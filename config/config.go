@@ -13,6 +13,7 @@ type Config struct {
 	Kafka          KafkaConfig     `mapstructure:",squash"`
 	ConfigSettings ConfigSetting   `mapstructure:",squash"`
 	AliAccess      AliAccessConfig `mapstructure:",squash"`
+	JWT            JWTConfig       `mapstructure:",squash"`
 }
 
 type AliAccessConfig struct {
@@ -45,6 +46,11 @@ type KafkaConfig struct {
 	Port string `mapstructure:"KAFKA_PORT"`
 }
 
+type JWTConfig struct {
+	AccessSecret  string `mapstructure:"ACCESS_JWT_SECRET"`
+	RefreshSecret string `mapstructure:"REFRESH_JWT_SECRET"`
+}
+
 // 从环境变量加载配置
 func LoadConfigEnv() error {
 	// 从环境变量加载配置
@@ -68,6 +74,14 @@ func LoadConfigEnv() error {
 		},
 		ConfigSettings: ConfigSetting{
 			Settings: viper.GetString("CONFIG_SETTING"),
+		},
+		AliAccess: AliAccessConfig{
+			AccessKey: viper.GetString("ALIYUN_ACCESS_KEY_ID"),
+			SecretKey: viper.GetString("ALIYUN_ACCESS_KEY_SECRET"),
+		},
+		JWT: JWTConfig{
+			AccessSecret:  viper.GetString("ACCESS_JWT_SECRET"),
+			RefreshSecret: viper.GetString("REFRESH_JWT_SECRET"),
 		},
 	}
 	return nil

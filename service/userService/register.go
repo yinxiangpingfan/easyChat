@@ -1,4 +1,4 @@
-package service
+package userService
 
 import (
 	"context"
@@ -53,16 +53,15 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	req.Password = tools.PasswordHash(req.Password, salt)
 	//保存用户信息到数据库
 	uuid := "U" + time.Now().Format("20060102") + uuid.New().String() //U+年月日+uuid
-	res = repo.UserRepositoryInstance.SaveUserInfo(model.UserInfo{
+	err = repo.UserRepositoryInstance.SaveUserInfo(model.UserInfo{
 		Uuid:      uuid,
 		Telephone: req.Telephone,
 		Password:  req.Password,
 		NickName:  req.Nickname,
 		Salt:      salt,
 	})
-	switch res {
-	case -1:
-		global.Logger.Errorf("注册时保存用户信息到数据库失败, req: %v", req.Telephone)
+	if err != nil {
+		global.Logger.Errorf("注册时保存用户信息到数据库失败, req: %v, err: %v", req.Telephone, err)
 		return errors.ErrRegisterFailed.Code, errors.ErrRegisterFailed.Message, nil, -1
 	}
 	global.Logger.Infof("注册时保存用户信息到数据库成功, req: %v", req.Telephone)

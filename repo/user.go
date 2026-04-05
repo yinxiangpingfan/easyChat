@@ -25,11 +25,23 @@ func (u *UserRepository) IsTelephoneRegistered(tele string) int {
 	return -2
 }
 
-func (u *UserRepository) SaveUserInfo(user model.UserInfo) int {
+func (u *UserRepository) SaveUserInfo(user model.UserInfo) error {
 	user.CreatedAt = time.Now()
 	if res := global.DB.Create(&user); res.Error != nil {
-		global.Logger.Errorf("保存用户信息失败: %v", res.Error)
-		return -1
+		return res.Error
 	}
-	return 0
+	return nil
+}
+
+// GetUserByPhone 根据手机号查询用户
+func (u *UserRepository) GetUserByPhone(phone string) (*model.UserInfo, error) {
+	var user model.UserInfo
+	if res := global.DB.Where("telephone = ?", phone).First(&user); res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil, nil // 用户不存在
+		}
+		global.Logger.Errorf("查询用户失败: %v", res.Error)
+		return nil, res.Error // 查询出错
+	}
+	return &user, nil // 查询成功
 }

@@ -17,7 +17,7 @@ func InitRouter() {
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type", "Authorization"}
 	global.GinEngine.Use(cors.New(corsConfig))
 	//http自动转成https
-	//TODO
+	//TODO: 后续再配置https
 	v1Group := global.GinEngine.Group("/v1")
 	v1Group.GET("/ping", v1.PingHandler())
 	//用户相关接口

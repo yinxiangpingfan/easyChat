@@ -55,6 +55,11 @@ func (u *UserService) LoginService(c *gin.Context, req req.LoginRequest) (int, s
 		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
 	}
 
+	// 更新最后登录时间
+	if err := repo.UserRepositoryInstance.UpdateLastOnlineAt(user.Uuid); err != nil {
+		global.Logger.Errorf("更新最后登录时间失败, phone: %s, err: %v", req.Phone, err)
+	}
+
 	// 返回登录成功
 	response := resp.LoginResp{
 		Uuid:         user.Uuid,

@@ -40,8 +40,16 @@ func (u *UserRepository) GetUserByPhone(phone string) (*model.UserInfo, error) {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // 用户不存在
 		}
-		global.Logger.Errorf("查询用户失败: %v", res.Error)
 		return nil, res.Error // 查询出错
 	}
 	return &user, nil // 查询成功
+}
+
+// UpdateLastOnlineAt 更新用户最后登录时间
+func (u *UserRepository) UpdateLastOnlineAt(uuid string) error {
+	now := time.Now()
+	if res := global.DB.Model(&model.UserInfo{}).Where("uuid = ?", uuid).Update("last_online_at", now); res.Error != nil {
+		return res.Error
+	}
+	return nil
 }

@@ -50,3 +50,18 @@ func LoginHandler() gin.HandlerFunc {
 		JsonBack(c, code, message, data, ret)
 	}
 }
+
+// 刷新 Token
+
+func RefreshTokenHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req req.RefreshTokenRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			global.Logger.Warnf("刷新 Token时参数绑定失败, err: %v", err)
+			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
+			return
+		}
+		code, message, data, ret := userService.UserServiceInstance.RefreshTokenService(c, req)
+		JsonBack(c, code, message, data, ret)
+	}
+}

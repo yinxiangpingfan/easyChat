@@ -32,6 +32,7 @@ var (
 var (
 	ErrAuthFormat  = ApiError{Code: 401000, Message: "AccessToken格式错误"}
 	ErrAuthExpired = ApiError{Code: 401001, Message: "AccessToken已过期或无效"}
+	ErrAuthFailed  = ApiError{Code: 500001, Message: "鉴权失败，请稍后重试"}
 )
 
 // ======================================登录======================================
@@ -43,4 +44,11 @@ var (
 	ErrLoginSmsCode      = ApiError{Code: 400005, Message: "验证码错误或已过期"}
 	ErrLoginFailed       = ApiError{Code: 500001, Message: "登录失败，请稍后重试"}
 	SuccessLogin         = ApiError{Code: 200, Message: "登录成功"}
+)
+
+// ======================================刷新Token======================================
+var (
+	ErrRefreshTokenInvalid       = ApiError{Code: 401002, Message: "RefreshToken无效或已过期"}
+	SuccessRefreshToken          = ApiError{Code: 200, Message: "刷新Token成功"}
+	ErrRefreshTokenRefreshFailed = ApiError{Code: 500001, Message: "刷新Token时失败，请稍后重试"}
 )

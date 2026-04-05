@@ -33,6 +33,7 @@ func AuthHttpMiddleware() gin.HandlerFunc {
 		if err != nil {
 			if errCode == 2 {
 				global.Logger.Errorf("jwt验证发生了逻辑错误 errCode: %d, err: %v", errCode, err)
+				JsonBack(c, errors.ErrAuthFailed.Code, errors.ErrAuthFailed.Message, nil, -1)
 			}
 			JsonBack(c, errors.ErrAuthExpired.Code, errors.ErrAuthExpired.Message, nil, -1)
 			c.Abort()

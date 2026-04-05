@@ -56,3 +56,17 @@ func VerifyAccessToken(tokenString string) ([]string, int, error) {
 	}
 	return nil, 2, errors.New("token is not valid")
 }
+
+// 验证刷新令牌
+func VerifyRefreshToken(tokenString string) ([]string, int, error) {
+	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(global.Config.JWT.RefreshSecret), nil
+	})
+	if err != nil {
+		return nil, 1, err
+	}
+	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
+		return []string{claims.Uuid, claims.Telephone}, 0, nil
+	}
+	return nil, 2, errors.New("token is not valid")
+}

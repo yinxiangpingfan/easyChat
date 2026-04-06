@@ -41,6 +41,9 @@ func (u *userService) UpdateUserInfoService(ctx context.Context, req req.UpdateU
 		log.Errorf("更新用户信息失败, uuid: %s, err: %v", uuid, err)
 		return errors.ErrUpdateUserInfoFailed.Code, errors.ErrUpdateUserInfoFailed.Message, nil, -1
 	}
+
+	// 清除用户信息缓存
+	u.redisClient.Del(ctx, userInfoCacheKeyPrefix+uuid)
 	// 返回实际更新的字段
 	response := resp.UpdateUserInfoResp{
 		Uuid:      uuid,

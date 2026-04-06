@@ -17,7 +17,7 @@ type LoginRequest struct {
 	LoginType string `json:"login_type" binding:"required,oneof=password sms_code"`
 	Phone     string `json:"phone" binding:"required"`
 	Password  string `json:"password" binding:"required_if=LoginType password"`
-	Code      string `json:"code" binding:"required_if=LoginType sms_code,omitempty,len=6"`
+	Code      string `json:"code" binding:"required_if=LoginType sms_code"`
 }
 
 type RefreshTokenRequest struct {

@@ -33,6 +33,10 @@ func (u *userService) LoginService(ctx context.Context, req req.LoginRequest) (i
 			return errors.ErrLoginPassword.Code, errors.ErrLoginPassword.Message, nil, -1
 		}
 	} else {
+		//判断验证码是否为6位
+		if len(req.Code) != 6 {
+			return errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1
+		}
 		// 验证码登录
 		code, err := tools.VerifyCode(ctx, req.Code, "verify:code:"+req.Phone, u.redisClient)
 		if err != nil {

@@ -35,7 +35,7 @@ func (u *userService) RegisterService(ctx context.Context, req req.RegisterReque
 	}
 
 	//判断手机号是否注册过
-	res := u.userRepo.IsTelephoneRegistered(req.Telephone)
+	res := u.userRepo.IsTelephoneRegistered(ctx, req.Telephone)
 	switch res {
 	case -1:
 		log.Errorf("注册时查询数据库失败, req: %v", req.Telephone)
@@ -53,7 +53,7 @@ func (u *userService) RegisterService(ctx context.Context, req req.RegisterReque
 	req.Password = tools.PasswordHash(req.Password, salt)
 	//保存用户信息到数据库
 	uuid := "U" + time.Now().Format("20060102") + uuid.New().String() //U+年月日+uuid
-	err = u.userRepo.SaveUserInfo(model.UserInfo{
+	err = u.userRepo.SaveUserInfo(ctx, model.UserInfo{
 		Uuid:      uuid,
 		Telephone: req.Telephone,
 		Password:  req.Password,

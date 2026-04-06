@@ -5,6 +5,7 @@ import (
 	"easyChat/internal/config"
 	"easyChat/internal/model"
 	"easyChat/internal/router"
+	gorm_plugin "easyChat/pkg/gorm_plugin"
 	"easyChat/pkg/log"
 	"fmt"
 	"path"
@@ -38,6 +39,10 @@ func initGorm(configs config.DatabaseConfig) *gorm.DB {
 	}
 	err = db.AutoMigrate(&model.UserInfo{}, &model.GroupInfo{}, &model.Message{}, &model.Session{}, &model.UserContact{}, &model.ContactApply{})
 	if err != nil {
+		panic(err)
+	}
+
+	if err := db.Use(gorm_plugin.NewSlowQueryPlugin(500 * time.Millisecond)); err != nil {
 		panic(err)
 	}
 

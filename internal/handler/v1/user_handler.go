@@ -14,7 +14,7 @@ type UserHandler interface {
 	RegisterHandler() gin.HandlerFunc
 	LoginHandler() gin.HandlerFunc
 	RefreshTokenHandler() gin.HandlerFunc
-	// GetUserInfoHandler() gin.HandlerFunc
+	GetUserInfoHandler() gin.HandlerFunc
 }
 type userHandler struct {
 	userService userService.UserService
@@ -81,9 +81,9 @@ func (u *userHandler) RefreshTokenHandler() gin.HandlerFunc {
 }
 
 // 获取用户信息
-// func (u *userHandler) GetUserInfoHandler() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		code, message, data, ret := u.userService.GetUserInfoService(c)
-// 		JsonBack(c, code, message, data, ret)
-// 	}
-// }
+func (u *userHandler) GetUserInfoHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		code, message, data, ret := u.userService.GetUserInfoService(c)
+		JsonBack(c, code, message, data, ret)
+	}
+}

@@ -17,7 +17,7 @@ func (u *userService) LoginService(ctx context.Context, req req.LoginRequest) (i
 	}
 
 	// 查询用户
-	user, err := u.userRepo.GetUserByPhone(req.Phone)
+	user, err := u.userRepo.GetUserByPhone(ctx, req.Phone)
 	if err != nil {
 		log.Errorf("登录查询用户失败, phone: %s, err: %v", req.Phone, err)
 		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
@@ -55,7 +55,7 @@ func (u *userService) LoginService(ctx context.Context, req req.LoginRequest) (i
 	}
 
 	// 更新最后登录时间
-	if err := u.userRepo.UpdateLastOnlineAt(user.Uuid); err != nil {
+	if err := u.userRepo.UpdateLastOnlineAt(ctx, user.Uuid); err != nil {
 		log.Errorf("更新最后登录时间失败, phone: %s, err: %v", req.Phone, err)
 	}
 

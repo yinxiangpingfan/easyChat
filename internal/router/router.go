@@ -39,9 +39,10 @@ func InitUserRouter(userGroup *gin.RouterGroup, configs *config.Config, db *gorm
 	userService := userService.NewUserService(configs.JWT, configs.AliAccess, userRepo, redisClient)
 	userHandler := v1.NewUserHandler(userService)
 	// 注册路由
-	userGroup.POST("/register", userHandler.RegisterHandler())    //注册
-	userGroup.POST("/sms", userHandler.SmsCodeHandler())          //验证码
-	userGroup.POST("/login", userHandler.LoginHandler())          //登录
-	userGroup.POST("/refresh", userHandler.RefreshTokenHandler()) //刷新token
-	//userGroup.GET("/getUserInfo", userHandler.GetUserInfoHandler()) //获取用户信息 TODO
+	userGroup.POST("/register", userHandler.RegisterHandler())      //注册
+	userGroup.POST("/sms", userHandler.SmsCodeHandler())            //验证码
+	userGroup.POST("/login", userHandler.LoginHandler())            //登录
+	userGroup.POST("/refresh", userHandler.RefreshTokenHandler())   //刷新token
+	userGroup.GET("/getUserInfo", userHandler.GetUserInfoHandler()) //获取用户信息
+
 }

@@ -52,3 +52,9 @@ var (
 	SuccessRefreshToken          = ApiError{Code: 200, Message: "刷新Token成功"}
 	ErrRefreshTokenRefreshFailed = ApiError{Code: 500001, Message: "刷新Token时失败，请稍后重试"}
 )
+
+// ======================================获取用户信息======================================
+var (
+	ErrGetUserInfoFailed = ApiError{Code: 500001, Message: "系统繁忙"}
+	SuccessGetUserInfo   = ApiError{Code: 200, Message: "获取用户信息成功"}
+)

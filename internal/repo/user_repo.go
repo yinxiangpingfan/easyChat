@@ -1,18 +1,21 @@
 package repo
 
 import (
+	"context"
 	"easyChat/internal/model"
 	"errors"
+	"fmt"
 	"time"
 
 	"gorm.io/gorm"
 )
 
 type UserRepository interface {
-	IsTelephoneRegistered(tele string) int
-	SaveUserInfo(user model.UserInfo) error
-	GetUserByPhone(phone string) (*model.UserInfo, error)
-	UpdateLastOnlineAt(uuid string) error
+	IsTelephoneRegistered(ctx context.Context, tele string) int
+	SaveUserInfo(ctx context.Context, user model.UserInfo) error
+	GetUserByPhone(ctx context.Context, phone string) (*model.UserInfo, error)
+	UpdateLastOnlineAt(ctx context.Context, uuid string) error
+	GetUserInfo(ctx context.Context, uuid string) (*model.UserInfo, error)
 }
 
 type userRepository struct {
@@ -24,9 +27,9 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 }
 
 // IsTelephoneRegistered 检查手机号是否已注册
-func (u *userRepository) IsTelephoneRegistered(tele string) int {
+func (u *userRepository) IsTelephoneRegistered(ctx context.Context, tele string) int {
 	var user model.UserInfo
-	if res := u.db.Where("telephone = ?", tele).First(&user); res.Error != nil {
+	if res := u.db.WithContext(ctx).Where("telephone = ?", tele).First(&user); res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return 0
 		} else {
@@ -37,18 +40,18 @@ func (u *userRepository) IsTelephoneRegistered(tele string) int {
 }
 
 // SaveUserInfo 保存用户信息
-func (u *userRepository) SaveUserInfo(user model.UserInfo) error {
+func (u *userRepository) SaveUserInfo(ctx context.Context, user model.UserInfo) error {
 	user.CreatedAt = time.Now()
-	if res := u.db.Create(&user); res.Error != nil {
+	if res := u.db.WithContext(ctx).Create(&user); res.Error != nil {
 		return res.Error
 	}
 	return nil
 }
 
 // GetUserByPhone 根据手机号查询用户
-func (u *userRepository) GetUserByPhone(phone string) (*model.UserInfo, error) {
+func (u *userRepository) GetUserByPhone(ctx context.Context, phone string) (*model.UserInfo, error) {
 	var user model.UserInfo
-	if res := u.db.Where("telephone = ?", phone).First(&user); res.Error != nil {
+	if res := u.db.WithContext(ctx).Where("telephone = ?", phone).First(&user); res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 			return nil, nil // 用户不存在
 		}
@@ -57,10 +60,22 @@ func (u *userRepository) GetUserByPhone(phone string) (*model.UserInfo, error) {
 	return &user, nil // 查询成功
 }
 
+// GetUserInfo 根据 uuid 查询用户信息
+func (u *userRepository) GetUserInfo(ctx context.Context, uuid string) (*model.UserInfo, error) {
+	var user model.UserInfo
+	if res := u.db.WithContext(ctx).Where("uuid = ?", uuid).First(&user); res.Error != nil {
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("用户不存在")
+		}
+		return nil, res.Error
+	}
+	return &user, nil
+}
+
 // UpdateLastOnlineAt 更新用户最后登录时间
-func (u *userRepository) UpdateLastOnlineAt(uuid string) error {
+func (u *userRepository) UpdateLastOnlineAt(ctx context.Context, uuid string) error {
 	now := time.Now()
-	if res := u.db.Model(&model.UserInfo{}).Where("uuid = ?", uuid).Update("last_online_at", now); res.Error != nil {
+	if res := u.db.WithContext(ctx).Model(&model.UserInfo{}).Where("uuid = ?", uuid).Update("last_online_at", now); res.Error != nil {
 		return res.Error
 	}
 	return nil

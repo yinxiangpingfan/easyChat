@@ -15,6 +15,7 @@ type UserHandler interface {
 	LoginHandler() gin.HandlerFunc
 	RefreshTokenHandler() gin.HandlerFunc
 	GetUserInfoHandler() gin.HandlerFunc
+	UpdateUserInfoHandler() gin.HandlerFunc
 }
 type userHandler struct {
 	userService userService.UserService
@@ -84,6 +85,21 @@ func (u *userHandler) RefreshTokenHandler() gin.HandlerFunc {
 func (u *userHandler) GetUserInfoHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		code, message, data, ret := u.userService.GetUserInfoService(c)
+		JsonBack(c, code, message, data, ret)
+	}
+}
+
+// 更新用户信息
+
+func (u *userHandler) UpdateUserInfoHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req req.UpdateUserInfoRequest
+		if err := c.ShouldBindJSON(&req); err != nil {
+			log.FromContext(c.Request.Context()).Warnf("更新用户信息时参数绑定失败, err: %v", err)
+			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
+			return
+		}
+		code, message, data, ret := u.userService.UpdateUserInfoService(c, req)
 		JsonBack(c, code, message, data, ret)
 	}
 }

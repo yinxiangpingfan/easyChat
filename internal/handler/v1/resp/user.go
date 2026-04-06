@@ -34,3 +34,13 @@ type UserInfoResp struct {
 	LastOnlineAt  *time.Time
 	LastOfflineAt *time.Time
 }
+
+type UpdateUserInfoResp struct {
+	Uuid      string `json:"uuid"`
+	Telephone string `json:"telephone,omitempty"`
+	NickName  string `json:"nickname,omitempty"`
+	Email     string `json:"email,omitempty"`
+	Gender    string `json:"gender,omitempty"`
+	Signature string `json:"signature,omitempty"`
+	Birthday  string `json:"birthday,omitempty"`
+}

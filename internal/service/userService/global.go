@@ -15,6 +15,7 @@ type UserService interface {
 	RegisterService(ctx context.Context, req req.RegisterRequest) (int, string, interface{}, int)
 	SmsCodeService(ctx context.Context, req req.SmsCodeRequest) (int, string, interface{}, int)
 	GetUserInfoService(ctx context.Context) (int, string, interface{}, int)
+	UpdateUserInfoService(ctx context.Context, req req.UpdateUserInfoRequest) (int, string, interface{}, int)
 }
 
 type userService struct {

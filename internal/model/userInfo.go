@@ -10,7 +10,7 @@ type UserInfo struct {
 	Telephone     string     `gorm:"type:char(11);column:telephone;index;not null;comment:电话"`
 	Email         string     `gorm:"type:char(30);column:email;comment:邮箱"`
 	Avatar        string     `gorm:"type:char(255);column:avatar;default:'https://ossapi.easyimpr.com/easychatava/default/default.png';not null;comment:头像"`
-	Gender        int8       `gorm:"type:tinyint;column:gender;comment:性别(0.男,1.女)"`
+	Gender        int8       `gorm:"type:tinyint;column:gender;default:0;comment:性别(0.男,1.女)"`
 	Signature     string     `gorm:"type:varchar(100);column:signature;comment:个性签名"`
 	Password      string     `gorm:"type:char(32);column:password;not null;comment:哈希后的密码"`
 	Birthday      string     `gorm:"type:char(8);column:birthday;comment:生日"`

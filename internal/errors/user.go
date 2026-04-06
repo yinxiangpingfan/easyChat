@@ -9,7 +9,7 @@ type ApiError struct {
 // ==========================================验证码==========================================
 
 var (
-	ErrRequestInvalid     = ApiError{Code: 400001, Message: "发送验证码请求错误"}
+	ErrRequestInvalid     = ApiError{Code: 400001, Message: "请求格式错误"}
 	ErrSmsCodeTooFrequent = ApiError{Code: 400003, Message: "发送太频繁，请稍后再试"}
 	ErrSmsCodeWrong       = ApiError{Code: 400004, Message: "验证码错误"}
 	ErrSmsCodeExpired     = ApiError{Code: 400005, Message: "验证码已过期或不存在"}
@@ -57,4 +57,10 @@ var (
 var (
 	ErrGetUserInfoFailed = ApiError{Code: 500001, Message: "系统繁忙"}
 	SuccessGetUserInfo   = ApiError{Code: 200, Message: "获取用户信息成功"}
+)
+
+// ======================================更新用户信息======================================
+var (
+	ErrUpdateUserInfoFailed = ApiError{Code: 500001, Message: "系统繁忙"}
+	SuccessUpdateUserInfo   = ApiError{Code: 200, Message: "更新用户信息成功"}
 )

@@ -23,3 +23,11 @@ type LoginRequest struct {
 type RefreshTokenRequest struct {
 	RefreshToken string `json:"refresh_token" binding:"required"`
 }
+
+type UpdateUserInfoRequest struct {
+	NickName  string `json:"nickname"`
+	Email     string `json:"email"`
+	Gender    string `json:"gender"`
+	Signature string `json:"signature"`
+	Birthday  string `json:"birthday"`
+}

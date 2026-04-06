@@ -16,6 +16,7 @@ type UserRepository interface {
 	GetUserByPhone(ctx context.Context, phone string) (*model.UserInfo, error)
 	UpdateLastOnlineAt(ctx context.Context, uuid string) error
 	GetUserInfo(ctx context.Context, uuid string) (*model.UserInfo, error)
+	UpdateUserInfo(ctx context.Context, uuid string, updateFields map[string]interface{}) error
 }
 
 type userRepository struct {
@@ -76,6 +77,17 @@ func (u *userRepository) GetUserInfo(ctx context.Context, uuid string) (*model.U
 func (u *userRepository) UpdateLastOnlineAt(ctx context.Context, uuid string) error {
 	now := time.Now()
 	if res := u.db.WithContext(ctx).Model(&model.UserInfo{}).Where("uuid = ?", uuid).Update("last_online_at", now); res.Error != nil {
+		return res.Error
+	}
+	return nil
+}
+
+// UpdateUserInfo 更新用户信息
+func (u *userRepository) UpdateUserInfo(ctx context.Context, uuid string, updateFields map[string]interface{}) error {
+	if len(updateFields) == 0 {
+		return nil
+	}
+	if res := u.db.WithContext(ctx).Model(&model.UserInfo{}).Where("uuid = ?", uuid).Updates(updateFields); res.Error != nil {
 		return res.Error
 	}
 	return nil

@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"easyChat/global"
+	"easyChat/internal/config"
 	"errors"
 	"time"
 
@@ -15,7 +15,7 @@ type MyCustomClaims struct {
 }
 
 // 生成访问令牌
-func GenerateAccessToken(uuid, tel string) (string, string, error) {
+func GenerateAccessToken(config config.JWTConfig, uuid, tel string) (string, string, error) {
 	accesssClaims := MyCustomClaims{
 		Uuid:      uuid,
 		Telephone: tel,
@@ -24,7 +24,7 @@ func GenerateAccessToken(uuid, tel string) (string, string, error) {
 			Issuer:    "easyChat",
 		},
 	}
-	accesssToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accesssClaims).SignedString([]byte(global.Config.JWT.AccessSecret))
+	accesssToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, accesssClaims).SignedString([]byte(config.AccessSecret))
 	if err != nil {
 		return "", "", err
 	}
@@ -36,7 +36,7 @@ func GenerateAccessToken(uuid, tel string) (string, string, error) {
 			Issuer:    "easyChat",
 		},
 	}
-	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(global.Config.JWT.RefreshSecret))
+	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(config.RefreshSecret))
 	if err != nil {
 		return "", "", err
 	}
@@ -44,9 +44,9 @@ func GenerateAccessToken(uuid, tel string) (string, string, error) {
 }
 
 // 验证访问令牌
-func VerifyAccessToken(tokenString string) ([]string, int, error) {
+func VerifyAccessToken(config config.JWTConfig, tokenString string) ([]string, int, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(global.Config.JWT.AccessSecret), nil
+		return []byte(config.AccessSecret), nil
 	})
 	if err != nil {
 		return nil, 1, err
@@ -58,9 +58,9 @@ func VerifyAccessToken(tokenString string) ([]string, int, error) {
 }
 
 // 验证刷新令牌
-func VerifyRefreshToken(tokenString string) ([]string, int, error) {
+func VerifyRefreshToken(config config.JWTConfig, tokenString string) ([]string, int, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte(global.Config.JWT.RefreshSecret), nil
+		return []byte(config.RefreshSecret), nil
 	})
 	if err != nil {
 		return nil, 1, err

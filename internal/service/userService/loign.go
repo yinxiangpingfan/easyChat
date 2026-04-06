@@ -1,16 +1,16 @@
 package userService
 
 import (
-	"easyChat/errors"
-	"easyChat/global"
-	"easyChat/handler/v1/req"
-	"easyChat/handler/v1/resp"
-	"easyChat/tools"
-
-	"github.com/gin-gonic/gin"
+	"context"
+	"easyChat/internal/errors"
+	"easyChat/internal/handler/v1/req"
+	"easyChat/internal/handler/v1/resp"
+	"easyChat/pkg/log"
+	"easyChat/pkg/tools"
 )
 
-func (u *userService) LoginService(c *gin.Context, req req.LoginRequest) (int, string, interface{}, int) {
+func (u *userService) LoginService(ctx context.Context, req req.LoginRequest) (int, string, interface{}, int) {
+	log := log.FromContext(ctx)
 	// 校验手机号格式
 	if !tools.IsPhone(req.Phone) {
 		return errors.ErrLoginPhone.Code, errors.ErrLoginPhone.Message, nil, -1
@@ -19,7 +19,7 @@ func (u *userService) LoginService(c *gin.Context, req req.LoginRequest) (int, s
 	// 查询用户
 	user, err := u.userRepo.GetUserByPhone(req.Phone)
 	if err != nil {
-		global.Logger.Errorf("登录查询用户失败, phone: %s, err: %v", req.Phone, err)
+		log.Errorf("登录查询用户失败, phone: %s, err: %v", req.Phone, err)
 		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
 	}
 	if user == nil {
@@ -34,7 +34,7 @@ func (u *userService) LoginService(c *gin.Context, req req.LoginRequest) (int, s
 		}
 	} else {
 		// 验证码登录
-		code, err := tools.VerifyCode(c, req.Code, "verify:code:"+req.Phone)
+		code, err := tools.VerifyCode(ctx, req.Code, "verify:code:"+req.Phone, u.redisClient)
 		if err != nil {
 			if code == errors.ErrSmsCodeWrong.Code {
 				return errors.ErrLoginSmsCode.Code, errors.ErrLoginSmsCode.Message, nil, -1
@@ -42,21 +42,21 @@ func (u *userService) LoginService(c *gin.Context, req req.LoginRequest) (int, s
 			if code == errors.ErrSmsCodeExpired.Code {
 				return errors.ErrLoginSmsCode.Code, errors.ErrLoginSmsCode.Message, nil, -1
 			}
-			global.Logger.Errorf("登录验证码校验失败, phone: %s, err: %v", req.Phone, err)
+			log.Errorf("登录验证码校验失败, phone: %s, err: %v", req.Phone, err)
 			return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
 		}
 	}
 
 	// 生成 token
-	accessToken, refreshToken, err := tools.GenerateAccessToken(user.Uuid, user.Telephone)
+	accessToken, refreshToken, err := tools.GenerateAccessToken(u.jwtConfig, user.Uuid, user.Telephone)
 	if err != nil {
-		global.Logger.Errorf("登录生成token失败, phone: %s, err: %v", req.Phone, err)
+		log.Errorf("登录生成token失败, phone: %s, err: %v", req.Phone, err)
 		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
 	}
 
 	// 更新最后登录时间
 	if err := u.userRepo.UpdateLastOnlineAt(user.Uuid); err != nil {
-		global.Logger.Errorf("更新最后登录时间失败, phone: %s, err: %v", req.Phone, err)
+		log.Errorf("更新最后登录时间失败, phone: %s, err: %v", req.Phone, err)
 	}
 
 	// 返回登录成功

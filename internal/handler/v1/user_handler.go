@@ -1,10 +1,10 @@
 package v1
 
 import (
-	"easyChat/errors"
-	"easyChat/global"
-	"easyChat/handler/v1/req"
-	"easyChat/service/userService"
+	"easyChat/internal/errors"
+	"easyChat/internal/handler/v1/req"
+	"easyChat/internal/service/userService"
+	"easyChat/pkg/log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,6 +14,7 @@ type UserHandler interface {
 	RegisterHandler() gin.HandlerFunc
 	LoginHandler() gin.HandlerFunc
 	RefreshTokenHandler() gin.HandlerFunc
+	// GetUserInfoHandler() gin.HandlerFunc
 }
 type userHandler struct {
 	userService userService.UserService
@@ -28,7 +29,7 @@ func (u *userHandler) SmsCodeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.SmsCodeRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			global.Logger.Warnf("发送验证码时参数绑定失败, err: %v", err)
+			log.FromContext(c.Request.Context()).Warnf("发送验证码时参数绑定失败, err: %v", err)
 			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
 			return
 		}
@@ -42,7 +43,7 @@ func (u *userHandler) RegisterHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.RegisterRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			global.Logger.Warnf("注册时参数绑定失败, err: %v", err)
+			log.FromContext(c.Request.Context()).Warnf("注册时参数绑定失败, err: %v", err)
 			JsonBack(c, errors.ErrRegisterParam.Code, errors.ErrRegisterParam.Message, nil, -1)
 			return
 		}
@@ -56,7 +57,7 @@ func (u *userHandler) LoginHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.LoginRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			global.Logger.Warnf("登录时参数绑定失败, err: %v", err)
+			log.FromContext(c.Request.Context()).Warnf("登录时参数绑定失败, err: %v", err)
 			JsonBack(c, errors.ErrLoginParam.Code, errors.ErrLoginParam.Message, nil, -1)
 			return
 		}
@@ -66,12 +67,11 @@ func (u *userHandler) LoginHandler() gin.HandlerFunc {
 }
 
 // 刷新 Token
-
 func (u *userHandler) RefreshTokenHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.RefreshTokenRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
-			global.Logger.Warnf("刷新 Token时参数绑定失败, err: %v", err)
+			log.FromContext(c.Request.Context()).Warnf("刷新 Token时参数绑定失败, err: %v", err)
 			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
 			return
 		}
@@ -79,3 +79,11 @@ func (u *userHandler) RefreshTokenHandler() gin.HandlerFunc {
 		JsonBack(c, code, message, data, ret)
 	}
 }
+
+// 获取用户信息
+// func (u *userHandler) GetUserInfoHandler() gin.HandlerFunc {
+// 	return func(c *gin.Context) {
+// 		code, message, data, ret := u.userService.GetUserInfoService(c)
+// 		JsonBack(c, code, message, data, ret)
+// 	}
+// }

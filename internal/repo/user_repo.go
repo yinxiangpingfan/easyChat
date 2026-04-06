@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"easyChat/model"
+	"easyChat/internal/model"
 	"errors"
 	"time"
 
@@ -15,8 +15,16 @@ type UserRepository interface {
 	UpdateLastOnlineAt(uuid string) error
 }
 
+type userRepository struct {
+	db *gorm.DB
+}
+
+func NewUserRepository(db *gorm.DB) UserRepository {
+	return &userRepository{db: db}
+}
+
 // IsTelephoneRegistered 检查手机号是否已注册
-func (u userRepository) IsTelephoneRegistered(tele string) int {
+func (u *userRepository) IsTelephoneRegistered(tele string) int {
 	var user model.UserInfo
 	if res := u.db.Where("telephone = ?", tele).First(&user); res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
@@ -29,7 +37,7 @@ func (u userRepository) IsTelephoneRegistered(tele string) int {
 }
 
 // SaveUserInfo 保存用户信息
-func (u userRepository) SaveUserInfo(user model.UserInfo) error {
+func (u *userRepository) SaveUserInfo(user model.UserInfo) error {
 	user.CreatedAt = time.Now()
 	if res := u.db.Create(&user); res.Error != nil {
 		return res.Error
@@ -38,7 +46,7 @@ func (u userRepository) SaveUserInfo(user model.UserInfo) error {
 }
 
 // GetUserByPhone 根据手机号查询用户
-func (u userRepository) GetUserByPhone(phone string) (*model.UserInfo, error) {
+func (u *userRepository) GetUserByPhone(phone string) (*model.UserInfo, error) {
 	var user model.UserInfo
 	if res := u.db.Where("telephone = ?", phone).First(&user); res.Error != nil {
 		if errors.Is(res.Error, gorm.ErrRecordNotFound) {

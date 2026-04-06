@@ -1,7 +1,7 @@
 package tools
 
 import (
-	"easyChat/global"
+	"easyChat/internal/config"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -16,11 +16,11 @@ import (
 
 // 发送验证码
 
-func CreateClient() (_result *dypnsapi20170525.Client, _err error) {
+func CreateClient(configs config.AliAccessConfig) (_result *dypnsapi20170525.Client, _err error) {
 	credentialsConfig := new(credentials.Config).
 		SetType("access_key").
-		SetAccessKeyId(global.Config.AliAccess.AccessKey).
-		SetAccessKeySecret(global.Config.AliAccess.SecretKey)
+		SetAccessKeyId(configs.AccessKey).
+		SetAccessKeySecret(configs.SecretKey)
 	credential, _err := credential.NewCredential(credentialsConfig)
 	if _err != nil {
 		return _result, _err
@@ -36,7 +36,7 @@ func CreateClient() (_result *dypnsapi20170525.Client, _err error) {
 	return _result, _err
 }
 
-func SendTelephoneCode(args []*string, code string) (_err error) {
+func SendTelephoneCode(configs config.AliAccessConfig, args []*string, code string) (_err error) {
 	// 参数验证
 	if len(args) < 4 {
 		return fmt.Errorf("参数不足，需要4个参数: 签名、手机号、模板代码、验证码有效期(分钟)")
@@ -48,7 +48,7 @@ func SendTelephoneCode(args []*string, code string) (_err error) {
 		}
 	}
 
-	client, _err := CreateClient()
+	client, _err := CreateClient(configs)
 	if _err != nil {
 		return _err
 	}
@@ -66,12 +66,10 @@ func SendTelephoneCode(args []*string, code string) (_err error) {
 				_e = r
 			}
 		}()
-		resp, _err := client.SendSmsVerifyCodeWithOptions(sendSmsVerifyCodeRequest, runtime)
+		_, _err := client.SendSmsVerifyCodeWithOptions(sendSmsVerifyCodeRequest, runtime)
 		if _err != nil {
 			return _err
 		}
-
-		global.Logger.Infof("SendSmsVerifyCodeResponse: %v", resp)
 
 		return nil
 	}()
@@ -89,10 +87,9 @@ func SendTelephoneCode(args []*string, code string) (_err error) {
 		d.Decode(&data)
 		if m, ok := data.(map[string]interface{}); ok {
 			recommend, _ := m["Recommend"]
-			global.Logger.Errorf("SendSmsVerifyCodeRecommend: %v,%v", recommend, error.Message)
-
+			return fmt.Errorf("SendSmsVerifyCodeRecommend: %v,%v", recommend, error.Message)
 		} else {
-			global.Logger.Errorf("SendSmsVerifyCodeError: %v", error)
+			return fmt.Errorf("SendSmsVerifyCodeError: %v", error)
 		}
 	}
 	return _err

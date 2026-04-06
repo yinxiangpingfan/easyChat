@@ -5,20 +5,19 @@ import (
 	"easyChat/global"
 	"easyChat/handler/v1/req"
 	"easyChat/handler/v1/resp"
-	"easyChat/repo"
 	"easyChat/tools"
 
 	"github.com/gin-gonic/gin"
 )
 
-func (u *UserService) LoginService(c *gin.Context, req req.LoginRequest) (int, string, interface{}, int) {
+func (u *userService) LoginService(c *gin.Context, req req.LoginRequest) (int, string, interface{}, int) {
 	// 校验手机号格式
 	if !tools.IsPhone(req.Phone) {
 		return errors.ErrLoginPhone.Code, errors.ErrLoginPhone.Message, nil, -1
 	}
 
 	// 查询用户
-	user, err := repo.UserRepositoryInstance.GetUserByPhone(req.Phone)
+	user, err := u.userRepo.GetUserByPhone(req.Phone)
 	if err != nil {
 		global.Logger.Errorf("登录查询用户失败, phone: %s, err: %v", req.Phone, err)
 		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
@@ -56,7 +55,7 @@ func (u *UserService) LoginService(c *gin.Context, req req.LoginRequest) (int, s
 	}
 
 	// 更新最后登录时间
-	if err := repo.UserRepositoryInstance.UpdateLastOnlineAt(user.Uuid); err != nil {
+	if err := u.userRepo.UpdateLastOnlineAt(user.Uuid); err != nil {
 		global.Logger.Errorf("更新最后登录时间失败, phone: %s, err: %v", req.Phone, err)
 	}
 

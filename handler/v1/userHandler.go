@@ -9,8 +9,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type UserHandler interface {
+	SmsCodeHandler() gin.HandlerFunc
+	RegisterHandler() gin.HandlerFunc
+	LoginHandler() gin.HandlerFunc
+	RefreshTokenHandler() gin.HandlerFunc
+}
+type userHandler struct {
+	userService userService.UserService
+}
+
+func NewUserHandler(userService userService.UserService) UserHandler {
+	return &userHandler{userService: userService}
+}
+
 // 发送验证码
-func SmsCodeHandler() gin.HandlerFunc {
+func (u *userHandler) SmsCodeHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.SmsCodeRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -18,13 +32,13 @@ func SmsCodeHandler() gin.HandlerFunc {
 			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
 			return
 		}
-		code, message, data, ret := userService.UserServiceInstance.SmsCodeService(c, req)
+		code, message, data, ret := u.userService.SmsCodeService(c, req)
 		JsonBack(c, code, message, data, ret)
 	}
 }
 
 // 注册
-func RegisterHandler() gin.HandlerFunc {
+func (u *userHandler) RegisterHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.RegisterRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -32,13 +46,13 @@ func RegisterHandler() gin.HandlerFunc {
 			JsonBack(c, errors.ErrRegisterParam.Code, errors.ErrRegisterParam.Message, nil, -1)
 			return
 		}
-		code, message, data, ret := userService.UserServiceInstance.RegisterService(c, req)
+		code, message, data, ret := u.userService.RegisterService(c, req)
 		JsonBack(c, code, message, data, ret)
 	}
 }
 
 // 登录
-func LoginHandler() gin.HandlerFunc {
+func (u *userHandler) LoginHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.LoginRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -46,14 +60,14 @@ func LoginHandler() gin.HandlerFunc {
 			JsonBack(c, errors.ErrLoginParam.Code, errors.ErrLoginParam.Message, nil, -1)
 			return
 		}
-		code, message, data, ret := userService.UserServiceInstance.LoginService(c, req)
+		code, message, data, ret := u.userService.LoginService(c, req)
 		JsonBack(c, code, message, data, ret)
 	}
 }
 
 // 刷新 Token
 
-func RefreshTokenHandler() gin.HandlerFunc {
+func (u *userHandler) RefreshTokenHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var req req.RefreshTokenRequest
 		if err := c.ShouldBindJSON(&req); err != nil {
@@ -61,7 +75,7 @@ func RefreshTokenHandler() gin.HandlerFunc {
 			JsonBack(c, errors.ErrRequestInvalid.Code, errors.ErrRequestInvalid.Message, nil, -1)
 			return
 		}
-		code, message, data, ret := userService.UserServiceInstance.RefreshTokenService(c, req)
+		code, message, data, ret := u.userService.RefreshTokenService(c, req)
 		JsonBack(c, code, message, data, ret)
 	}
 }

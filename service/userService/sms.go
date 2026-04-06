@@ -16,7 +16,7 @@ var LOCK_PREFIX = "verify:lock:"
 var CODE_TIMEOUT = 300
 var LOCK_TIMEOUT = 60
 
-func (u *UserService) SmsCodeService(ctx context.Context, req req.SmsCodeRequest) (int, string, interface{}, int) {
+func (u *userService) SmsCodeService(ctx context.Context, req req.SmsCodeRequest) (int, string, interface{}, int) {
 	isTel := tools.IsPhone(req.Telephone)
 	if !isTel {
 		return errors.ErrPhoneFormat.Code, errors.ErrPhoneFormat.Message, nil, -1

@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (u *UserService) RefreshTokenService(c *gin.Context, req req.RefreshTokenRequest) (int, string, interface{}, int) {
+func (u *userService) RefreshTokenService(c *gin.Context, req req.RefreshTokenRequest) (int, string, interface{}, int) {
 	// 验证 RefreshToken
 	info, code, err := tools.VerifyRefreshToken(req.RefreshToken)
 	if err != nil {

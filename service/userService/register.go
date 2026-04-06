@@ -7,14 +7,13 @@ import (
 	"easyChat/handler/v1/req"
 	"easyChat/handler/v1/resp"
 	"easyChat/model"
-	"easyChat/repo"
 	"easyChat/tools"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-func (u *UserService) RegisterService(ctx context.Context, req req.RegisterRequest) (int, string, interface{}, int) {
+func (u *userService) RegisterService(ctx context.Context, req req.RegisterRequest) (int, string, interface{}, int) {
 	//校验参数
 	if !tools.IsPhone(req.Telephone) {
 		global.Logger.Debugf("手机号格式错误, req: %v", req.Telephone)
@@ -35,7 +34,7 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	}
 
 	//判断手机号是否注册过
-	res := repo.UserRepositoryInstance.IsTelephoneRegistered(req.Telephone)
+	res := u.userRepo.IsTelephoneRegistered(req.Telephone)
 	switch res {
 	case -1:
 		global.Logger.Errorf("注册时查询数据库失败, req: %v", req.Telephone)
@@ -53,7 +52,7 @@ func (u *UserService) RegisterService(ctx context.Context, req req.RegisterReque
 	req.Password = tools.PasswordHash(req.Password, salt)
 	//保存用户信息到数据库
 	uuid := "U" + time.Now().Format("20060102") + uuid.New().String() //U+年月日+uuid
-	err = repo.UserRepositoryInstance.SaveUserInfo(model.UserInfo{
+	err = u.userRepo.SaveUserInfo(model.UserInfo{
 		Uuid:      uuid,
 		Telephone: req.Telephone,
 		Password:  req.Password,

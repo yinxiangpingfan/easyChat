@@ -1,9 +1,5 @@
 package resp
 
-import (
-	"time"
-)
-
 type RegisterResp struct {
 	Uuid      string `json:"uuid"`
 	NickName  string `json:"nick_name"`
@@ -24,15 +20,13 @@ type RefreshTokenResp struct {
 }
 
 type UserInfoResp struct {
-	Uuid          string
-	NickName      string
-	Telephone     string
-	Email         string
-	Avatar        string
-	Signature     string
-	Birthday      string
-	LastOnlineAt  *time.Time
-	LastOfflineAt *time.Time
+	Uuid      string
+	NickName  string
+	Telephone string
+	Email     string
+	Avatar    string
+	Signature string
+	Birthday  string
 }
 
 type UpdateUserInfoResp struct {

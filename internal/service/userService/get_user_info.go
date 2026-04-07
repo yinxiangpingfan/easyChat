@@ -38,15 +38,13 @@ func (u *userService) GetUserInfoService(ctx context.Context) (int, string, inte
 
 	// 3. 写入缓存
 	userInfo := resp.UserInfoResp{
-		Uuid:          user.Uuid,
-		NickName:      user.NickName,
-		Telephone:     user.Telephone,
-		Email:         user.Email,
-		Avatar:        user.Avatar,
-		Signature:     user.Signature,
-		Birthday:      user.Birthday,
-		LastOnlineAt:  user.LastOnlineAt,
-		LastOfflineAt: user.LastOfflineAt,
+		Uuid:      user.Uuid,
+		NickName:  user.NickName,
+		Telephone: user.Telephone,
+		Email:     user.Email,
+		Avatar:    user.Avatar,
+		Signature: user.Signature,
+		Birthday:  user.Birthday,
 	}
 	if data, err := json.Marshal(userInfo); err == nil {
 		u.redisClient.Set(ctx, cacheKey, string(data), userInfoCacheTTL)

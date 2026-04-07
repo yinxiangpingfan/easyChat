@@ -4,6 +4,7 @@ import (
 	"easyChat/internal/config"
 	"easyChat/internal/repo"
 	"easyChat/internal/service/adminServer"
+	"easyChat/internal/service/contactService"
 	"easyChat/internal/service/userService"
 
 	v1 "easyChat/internal/handler/v1"
@@ -36,8 +37,12 @@ func InitRouter(ginEngine *gin.Engine, logger *logrus.Logger, configs *config.Co
 	//管理员相关接口
 	adminGroup := v1Group.Group("/admin")
 	InitAdminRouter(adminGroup, middlewareHandler.AuthHttpMiddleware(), middlewareHandler.CheckAdminMiddleware(), db, cacheCache, redisClient)
+	//联系人相关接口
+	contactGroup := v1Group.Group("/contact")
+	InitContactRouter(contactGroup, middlewareHandler.AuthHttpMiddleware(), db, redisClient)
 }
 
+// InitUserRouter 初始化用户路由
 func InitUserRouter(userGroup *gin.RouterGroup, authMiddlewareHandler gin.HandlerFunc, configs *config.Config, db *gorm.DB, redisClient *redis.Client) {
 	//依赖注入
 	userRepo := repo.NewUserRepository(db)
@@ -52,6 +57,7 @@ func InitUserRouter(userGroup *gin.RouterGroup, authMiddlewareHandler gin.Handle
 	userGroup.POST("/updateUserInfo", authMiddlewareHandler, userHandler.UpdateUserInfoHandler()) //更新用户信息
 }
 
+// InitAdminRouter 初始化管理员路由
 func InitAdminRouter(adminGroup *gin.RouterGroup, authMiddlewareHandler gin.HandlerFunc, checkAdminMiddlewareHandler gin.HandlerFunc, db *gorm.DB, cacheCache *cache.Cache, redisClient *redis.Client) {
 	//依赖注入
 	adminRepo := repo.NewAdminRepository(db)
@@ -61,4 +67,16 @@ func InitAdminRouter(adminGroup *gin.RouterGroup, authMiddlewareHandler gin.Hand
 	adminGroup.GET("/getUserInfoList", authMiddlewareHandler, checkAdminMiddlewareHandler, adminHandler.GetUserInfoList())
 	adminGroup.POST("/banUser", authMiddlewareHandler, checkAdminMiddlewareHandler, adminHandler.BanUser())
 	adminGroup.POST("/enableUser", authMiddlewareHandler, checkAdminMiddlewareHandler, adminHandler.EnableUser())
+}
+
+// InitContactRouter 初始化联系人路由
+func InitContactRouter(contactGroup *gin.RouterGroup, authMiddlewareHandler gin.HandlerFunc, db *gorm.DB, redisClient *redis.Client) {
+	//依赖注入
+	contactRepo := repo.NewContactRepository(db)
+	contactService := contactService.NewContactService(contactRepo, redisClient)
+	contactHandler := v1.NewContactHandler(contactService)
+	//注册路由
+	contactGroup.POST("/getContactInfo", authMiddlewareHandler, contactHandler.GetContactInfoHandler()) //获取联系人信息
+	contactGroup.POST("/add", authMiddlewareHandler, contactHandler.AddContactHandler())                //添加联系人
+	contactGroup.POST("/delete", authMiddlewareHandler, contactHandler.DeleteContactHandler())          //删除联系人
 }

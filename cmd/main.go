@@ -7,11 +7,13 @@ import (
 	"easyChat/internal/router"
 	gorm_plugin "easyChat/pkg/gorm_plugin"
 	"easyChat/pkg/log"
+	"easyChat/pkg/tools"
 	"fmt"
 	"path"
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/patrickmn/go-cache"
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -22,9 +24,13 @@ func main() {
 	configs := config.GetConfig(path.Join(".", ".env")) //0: 从环境变量加载配置 1: 从文件加载配置
 	// 初始化日志
 	log.Logger = log.InitLogrus("debug", path.Join(".", "logFile", "run.jsonl"))
+	//初始化本地缓存
+	redisC := initRedis(configs.Redis)
+	cacheCache := cache.New(5*time.Minute, 10*time.Minute)
+	go tools.ListenToBanListChannel(cacheCache, redisC)
 	//启动web服务
 	ginEngine := gin.Default()
-	router.InitRouter(ginEngine, log.Logger, configs, initGorm(configs.Database), initRedis(configs.Redis))
+	router.InitRouter(ginEngine, log.Logger, configs, initGorm(configs.Database), redisC, cacheCache)
 	ginEngine.Run(":" + configs.Server.Port)
 }
 

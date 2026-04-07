@@ -18,7 +18,7 @@ type UserInfo struct {
 	DeletedAt     *time.Time `gorm:"type:datetime;column:deleted_at;comment:删除时间"`
 	LastOnlineAt  *time.Time `gorm:"type:datetime;column:last_online_at;comment:上次登录时间"`
 	LastOfflineAt *time.Time `gorm:"type:datetime;column:last_offline_at;comment:最近离线时间"`
-	IsAdmin       int8       `gorm:"type:tinyint;column:is_admin;not null;default:0;comment:是否管理员(0.否,1.是)"`
+	IsAdmin       int8       `gorm:"type:tinyint;column:is_admin;not null;default:0;comment:是否管理员(0.否,1.是,2.是超级管理员	)"`
 	Status        int8       `gorm:"type:tinyint;column:status;index;not null;default:0;comment:状态(0.正常,1.禁用)"`
 	Salt          string     `gorm:"type:char(32);column:salt;not null;comment:盐值"`
 }

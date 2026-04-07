@@ -22,10 +22,28 @@ func (u *userService) RefreshTokenService(ctx context.Context, req req.RefreshTo
 	}
 
 	uuid := info[0]
+	//检验redis中是否有对应的refreshToken
+	exists, err := u.redisClient.Exists(ctx, RefreshTokenRedisKey+uuid).Result()
+	if err != nil {
+		log.Errorf("RefreshToken验证时发生系统性失败: %v", err)
+		return errors.ErrRefreshTokenRefreshFailed.Code, errors.ErrRefreshTokenRefreshFailed.Message, nil, -1
+	}
+	if exists == 0 {
+		return errors.ErrRefreshTokenInvalid.Code, errors.ErrRefreshTokenInvalid.Message, nil, -1
+	}
 	telephone := info[1]
+	isAdmin := 0
+	switch info[2] {
+	case "admin":
+		isAdmin = 1
+	case "superAdmin":
+		isAdmin = 2
+	default:
+		isAdmin = 0
+	}
 
 	// 生成新的 Token
-	accessToken, refreshToken, err := tools.GenerateAccessToken(u.jwtConfig, uuid, telephone)
+	accessToken, refreshToken, err := tools.GenerateAccessToken(u.jwtConfig, uuid, telephone, int8(isAdmin))
 	if err != nil {
 		log.Errorf("刷新Token失败: %v", err)
 		return errors.ErrRefreshTokenRefreshFailed.Code, errors.ErrRefreshTokenRefreshFailed.Message, nil, -1

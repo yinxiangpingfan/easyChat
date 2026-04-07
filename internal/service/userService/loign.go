@@ -7,6 +7,11 @@ import (
 	"easyChat/internal/handler/v1/resp"
 	"easyChat/pkg/log"
 	"easyChat/pkg/tools"
+	"time"
+)
+
+const (
+	RefreshTokenRedisKey = "refreshToken:"
 )
 
 func (u *userService) LoginService(ctx context.Context, req req.LoginRequest) (int, string, interface{}, int) {
@@ -50,11 +55,21 @@ func (u *userService) LoginService(ctx context.Context, req req.LoginRequest) (i
 			return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
 		}
 	}
+	//判断用户是否被禁用
+	if user.Status == 1 {
+		return errors.ErrLoginUserBanned.Code, errors.ErrLoginUserBanned.Message, nil, -1
+	}
 
 	// 生成 token
-	accessToken, refreshToken, err := tools.GenerateAccessToken(u.jwtConfig, user.Uuid, user.Telephone)
+	accessToken, refreshToken, err := tools.GenerateAccessToken(u.jwtConfig, user.Uuid, user.Telephone, user.IsAdmin)
 	if err != nil {
 		log.Errorf("登录生成token失败, phone: %s, err: %v", req.Phone, err)
+		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
+	}
+
+	//把refreshToken存入redis
+	if err := u.redisClient.Set(ctx, RefreshTokenRedisKey+user.Uuid, refreshToken, 168*time.Hour).Err(); err != nil {
+		log.Errorf("登录把refreshToken存入redis失败, phone: %s, err: %v", req.Phone, err)
 		return errors.ErrLoginFailed.Code, errors.ErrLoginFailed.Message, nil, -1
 	}
 

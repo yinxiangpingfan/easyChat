@@ -42,6 +42,7 @@ var (
 	ErrLoginUserNotExist = ApiError{Code: 400003, Message: "用户不存在"}
 	ErrLoginPassword     = ApiError{Code: 400004, Message: "密码错误"}
 	ErrLoginSmsCode      = ApiError{Code: 400005, Message: "验证码错误或已过期"}
+	ErrLoginUserBanned   = ApiError{Code: 400006, Message: "用户已被禁用"}
 	ErrLoginFailed       = ApiError{Code: 500001, Message: "登录失败，请稍后重试"}
 	SuccessLogin         = ApiError{Code: 200, Message: "登录成功"}
 )
